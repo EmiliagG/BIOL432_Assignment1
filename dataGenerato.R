@@ -16,13 +16,13 @@ print(speciesOutput)
   
 #create a vector for limb width
 limb_widthOutput<-vector("numeric",Iters)
-for(i in 1:Iters2){
+for(i in 1:Iters){
   limb_widthOutput[i]<-rnorm(1,2,0.5)
 }
 
 #create a vector for limb length
 limb_lengthOutput<-vector("numeric", Iters)
-for (i in 1:Iters3) {
+for (i in 1:Iters) {
   limb_lengthOutput[i] <-rnorm(1, 5, 2)
 }
 
