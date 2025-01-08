@@ -1,0 +1,48 @@
+---
+title: "A1_Gillette_20204160.Rmd"
+author: "EGillette (20204160)"
+date: "2025-01-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+https://github.com/EmiliagG/BIOL432_Assignment1
+This section involves loading in the measurement data
+```{r}
+  measurementData<-read.table("https://raw.githubusercontent.com/EmiliagG/BIOL432_Assignment1/main/measurements.csv", header=T, sep="," )
+```
+
+#Sorting the Data
+
+The data is first sorted by species, then observer, and then limb volume
+
+```{r}
+arrange(measurementData, Organism, Observer, Volume, by.group=FALSE)
+```
+#Creating a Table for Average Limb Volume per Species
+
+```{r}
+measurementData %>%
+  group_by(Organism) %>%
+  summarize(Mean_volume= mean(Volume,na.rm = TRUE))
+  
+```
+#Creating a Table for the Average Number of Observations
+
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
