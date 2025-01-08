@@ -40,5 +40,6 @@ measurements<-data.frame("Organism" = speciesOutput,
                          "Observer" = observer_Output)
 head(measurements)
 
-write.csv(measurements, "measurements.csv")
+write.csv(measurements, "measurements.csv", row.names = FALSE)
+
 
