@@ -2,7 +2,9 @@
 title: "A1_Gillette_20204160.Rmd"
 author: "EGillette (20204160)"
 date: "2025-01-08"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -11,38 +13,114 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
+## Running the dataGenerato.R script
+
 https://github.com/EmiliagG/BIOL432_Assignment1
-This section involves loading in the measurement data
+
+This script uses for loops to generate a dataframe with four variables: Organism, Limb width, Limb length, and Observer. The script then writes the data frame out to a csv.file. For Limb width and Limb length, the values are randomly selected from normal distributions around a means of 2 +/- 0.5 and 5 +/- 2, respectively. 
+
 ```{r}
-  measurementData<-read.table("https://raw.githubusercontent.com/EmiliagG/BIOL432_Assignment1/main/measurements.csv", header=T, sep="," )
+DataGenerato<-source('dataGenerato.R')
 ```
 
-#Sorting the Data
+## Running the volumeEstimato.R script
 
-The data is first sorted by species, then observer, and then limb volume
+This script estimates the limb volume using the provided limb width and limb length variables from the script above. Limb volume is calculated using the equation for calculating the volume of a cylinder.This script is meant to overwrite the measurements.csv file generated in the dataGenerato.R script above. 
+
+```{r, message= FALSE, warning= FALSE}
+VolumeEstimato<-source('volumeEstimato.R')
+```
+
+## Loading the measurement.csv data from GitHub
+
+This section involves loading in the measurement data csv.
+
+```{r}
+measurementData<-read.table("https://raw.githubusercontent.com/EmiliagG/BIOL432_Assignment1/main/measurements.csv", header=T, sep="," )
+```
+
+## Sorting the Data
+
+The data is first sorted by species, then observer, and then limb volume.
 
 ```{r}
 arrange(measurementData, Organism, Observer, Volume, by.group=FALSE)
 ```
-#Creating a Table for Average Limb Volume per Species
+## Creating a Table for Average Limb Volume per Species
 
 ```{r}
 measurementData %>%
   group_by(Organism) %>%
   summarize(Mean_volume= mean(Volume,na.rm = TRUE))
-  
 ```
-#Creating a Table for the Average Number of Observations
+## Creating a Table for the Total Number of Observations
 
+```{r}
+TotalObs<-measurementData %>%
+  group_by(Organism, Observer) %>%
+  summarize(Total_obs = n(), .groups='drop')
+TotalObs
 
-
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Creating a boxplot to compare volume between species
+
+The boxplot below compares the distributions of volume for the five different species:
+
+```{r, message= FALSE, warning=FALSE}
+library(ggplot2)
+ggplot(measurementData, aes(x=Organism, y=Volume)) + stat_boxplot(geom = "errorbar",
+               width = 0.15) + geom_boxplot()
+```
+
+The figure above shows B.Papyrifera with a higher median limb volume, while V.vulpes has the smallest interquartile range. 
+
+## Creating a Multi-Panel Plot for Volume Frequencies per Species
+
+```{r, message= FALSE, warning= FALSE, results = 'hide'}
+install.packages("gridExtra", repos = "http://cran.us.r-project.org")
+library(gridExtra)
+
+#plot for Betula
+Bp<-measurementData %>% 
+  filter(Organism == "Betula papyrifera")%>% 
+  ggplot(aes(x= Volume, fill= Organism)) +
+    geom_histogram(color="#e9ecef", alpha = 0.5, bins = 30)+
+  ylab("Frequency")
+
+Cc<-measurementData %>% 
+  filter(Organism == "Cardinalis cardinalis")%>% 
+  ggplot(aes(x= Volume, fill= Organism)) +
+    geom_histogram( color="#e9ecef", alpha = 0.5, bins = 30) + 
+  ylab("Frequency")
+
+Cv<-measurementData %>% 
+  filter(Organism == "Cirsium vulgare")%>% 
+  ggplot(aes(x= Volume, fill=Organism)) +
+    geom_histogram( color="#e9ecef", alpha = 0.5, bins = 30) + 
+  ylab("Frequency")
+
+Dp<-measurementData %>% 
+  filter(Organism == "Danaus plexippus")%>% 
+  ggplot(aes(x= Volume, fill= Organism)) +
+    geom_histogram(color="#e9ecef", alpha = 0.5, bins = 30) + 
+  ylab("Frequency")
+
+Vv<-measurementData %>% 
+  filter(Organism == "Vulpes vulpes")%>% 
+  ggplot(aes(x= Volume, fill= Organism)) +
+    geom_histogram( color="#e9ecef", alpha = 0.5, bins = 30) + 
+  ylab("Frequency")
+
+grid.arrange(Bp, Cc, Cv, Dp, Vv, nrow = 3)
+```
+
+
+
+
+
+
+
+
+
+
